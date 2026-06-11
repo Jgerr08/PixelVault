@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>PixelVault</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #f5f5f7;
+    color: #1d1d1f;
+}
+
+header {
+    background: white;
+    border-bottom: 1px solid #eee;
+    padding: 15px 40px;
+}
+
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo-img {
+    height: 100px;
+}
+
+.brand {
+    font-weight: 700;
+    font-size: 20px;
+}
+
+.right {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-item {
+    cursor: pointer;
+    color: #555;
+}
+
+.nav-item:hover {
+    color: #6a00ff;
+}
+
+
+.hero {
+    padding: 60px 40px 20px;
+}
+
+.hero h1 {
+    font-size: 40px;
+    margin: 0;
+}
+
+.hero p {
+    color: #666;
+    margin-top: 10px;
+}
+
+
+.container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px 40px;
+}
+
+
+select {
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    margin-bottom: 20px;
+}
+
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+
+.card {
+    background: white;
+    border-radius: 18px;
+    padding: 18px;
+    transition: all 0.25s ease;
+    box-shadow: 0 6px 25px rgba(0,0,0,0.06);
+}
+
+.card:hover {
+    transform: translateY(-6px);
+}
+
+.titulo {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.info {
+    color: gray;
+    margin: 4px 0;
+    font-size: 14px;
+}
+
+.precio {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.stock {
+    margin-top: 4px;
+    font-size: 13px;
+}
+
+/* BOTÓN */
+.btn {
+    margin-top: 12px;
+    padding: 10px;
+    width: 100%;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #6a00ff, #c300ff);
+    color: white;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn:hover {
+    opacity: 0.85;
+}
+
+.btn:disabled {
+    background: gray;
+}
+
+.stock-ok {
+    color: #6a00ff;
+}
+
+.stock-no {
+    color: #c300ff;
+}
+
+
+@media (max-width: 600px) {
+
+    header {
+        padding: 10px 20px;
+    }
+
+    .hero {
+        padding: 30px 20px;
+    }
+
+    .hero h1 {
+        font-size: 26px;
+    }
+
+    .container {
+        padding: 10px 20px;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .right {
+        display: none;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="nav">
+        <div class="left">
+            <img src="top_game_store.png" class="logo-img">
+            <span class="brand">PixelVault</span>
+        </div>
+
+       
+    </div>
+</header>
+
+<section class="hero">
+    <h1>Tu tienda de videojuegos de confianza</h1>
+    <p>Catálogo oficial de la tienda PixelVault</p>
+</section>
+
+<div class="container">
+
+<select id="filtro">
+    <option value="">Todas las consolas</option>
+    <option value="Xbox">Xbox</option>
+    <option value="PlayStation">PlayStation</option>
+    <option value="Nintendo">Nintendo</option>
+    <option value="PC">PC</option>
+</select>
+
+<div class="grid" id="catalogo"></div>
+
+</div>
+
+<script>
+
+const juegos = [
+    { id: "1", titulo: "Halo Infinite", consola: "Xbox", precio: 1200, stock: 5 },
+    { id: "2", titulo: "God of War Ragnarok", consola: "PlayStation", precio: 1400, stock: 3 },
+    { id: "3", titulo: "Zelda TOTK", consola: "Nintendo", precio: 1300, stock: 0 },
+    { id: "4", titulo: "Cyberpunk 2077", consola: "PC", precio: 900, stock: 8 },
+    { id: "5", titulo: "FIFA 25", consola: "PlayStation", precio: 1100, stock: 2 }
+];
+
+function cargarJuegos() {
+    let consolaFiltro = document.getElementById("filtro").value;
+
+    let lista = juegos;
+
+    if (consolaFiltro) {
+        lista = juegos.filter(j => j.consola === consolaFiltro);
+    }
+
+    let contenedor = document.getElementById("catalogo");
+    contenedor.innerHTML = "";
+
+    lista.forEach(j => {
+
+        let stockClass = j.stock > 0 ? "stock-ok" : "stock-no";
+
+        let card = document.createElement("div");
+        card.className = "card";
+
+        card.innerHTML = `
+            <div class="titulo">${j.titulo}</div>
+            <div class="info">${j.consola}</div>
+            <div class="precio">$${j.precio}</div>
+            <div class="stock ${stockClass}">
+                ${j.stock > 0 ? "Disponibles: " + j.stock : "Agotado"}
+            </div>
+            <button class="btn"
+                ${j.stock <= 0 ? "disabled" : ""}
+                onclick="comprar('${j.id}')">
+                Comprar
+            </button>
+        `;
+
+        contenedor.appendChild(card);
+    });
+}
+
+function comprar(id) {
+    let juego = juegos.find(j => j.id === id);
+
+    if (juego.stock > 0) {
+        juego.stock--;
+        alert("Compra simulada");
+        cargarJuegos();
+    }
+}
+
+document.getElementById("filtro").addEventListener("change", cargarJuegos);
+
+cargarJuegos();
+
+</script>
+
+</body>
+</html>
