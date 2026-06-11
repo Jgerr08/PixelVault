@@ -15,7 +15,7 @@ body {
 header {
     background: white;
     border-bottom: 1px solid #eee;
-    padding: 15px 40px;
+    padding: 12px 40px;
 }
 
 .nav {
@@ -27,32 +27,19 @@ header {
 .left {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 .logo-img {
     height: 100px;
+    width: auto;
+    object-fit: contain;
 }
 
 .brand {
     font-weight: 700;
     font-size: 20px;
 }
-
-.right {
-    display: flex;
-    gap: 20px;
-}
-
-.nav-item {
-    cursor: pointer;
-    color: #555;
-}
-
-.nav-item:hover {
-    color: #6a00ff;
-}
-
 
 .hero {
     padding: 60px 40px 20px;
@@ -68,13 +55,11 @@ header {
     margin-top: 10px;
 }
 
-
 .container {
     max-width: 1200px;
     margin: auto;
     padding: 20px 40px;
 }
-
 
 select {
     padding: 10px;
@@ -83,13 +68,11 @@ select {
     margin-bottom: 20px;
 }
 
-
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 20px;
 }
-
 
 .card {
     background: white;
@@ -125,27 +108,6 @@ select {
     font-size: 13px;
 }
 
-/* BOTÓN */
-.btn {
-    margin-top: 12px;
-    padding: 10px;
-    width: 100%;
-    border: none;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #6a00ff, #c300ff);
-    color: white;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.btn:hover {
-    opacity: 0.85;
-}
-
-.btn:disabled {
-    background: gray;
-}
-
 .stock-ok {
     color: #6a00ff;
 }
@@ -154,9 +116,13 @@ select {
     color: #c300ff;
 }
 
+.mensaje {
+    text-align: center;
+    color: #777;
+    margin-top: 20px;
+}
 
 @media (max-width: 600px) {
-
     header {
         padding: 10px 20px;
     }
@@ -177,8 +143,8 @@ select {
         grid-template-columns: 1fr;
     }
 
-    .right {
-        display: none;
+    .logo-img {
+        height: 26px;
     }
 }
 </style>
@@ -192,8 +158,6 @@ select {
             <img src="top_game_store.png" class="logo-img">
             <span class="brand">PixelVault</span>
         </div>
-
-       
     </div>
 </header>
 
@@ -218,28 +182,41 @@ select {
 
 <script>
 
-const juegos = [
-    { id: "1", titulo: "Halo Infinite", consola: "Xbox", precio: 1200, stock: 5 },
-    { id: "2", titulo: "God of War Ragnarok", consola: "PlayStation", precio: 1400, stock: 3 },
-    { id: "3", titulo: "Zelda TOTK", consola: "Nintendo", precio: 1300, stock: 0 },
-    { id: "4", titulo: "Cyberpunk 2077", consola: "PC", precio: 900, stock: 8 },
-    { id: "5", titulo: "FIFA 25", consola: "PlayStation", precio: 1100, stock: 2 }
-];
+let juegosGlobal = [];
 
-function cargarJuegos() {
-    let consolaFiltro = document.getElementById("filtro").value;
+async function cargarJuegos() {
+    try {
+        let res = await fetch("http://192.168.1.5:8080/games"); // 👈 CAMBIA SOLO SI TU IP ES OTRA
 
-    let lista = juegos;
+        if (!res.ok) throw new Error("Error servidor");
 
-    if (consolaFiltro) {
-        lista = juegos.filter(j => j.consola === consolaFiltro);
+        juegosGlobal = await res.json();
+        render(juegosGlobal);
+
+    } catch (error) {
+        document.getElementById("catalogo").innerHTML =
+            "<p class='mensaje'>Error cargando catálogo</p>";
+    }
+}
+
+function render(lista) {
+    let filtro = document.getElementById("filtro").value;
+
+    if (filtro) {
+        lista = lista.filter(j => j.consola === filtro);
     }
 
     let contenedor = document.getElementById("catalogo");
+
+    if (lista.length === 0) {
+        contenedor.innerHTML =
+            "<p class='mensaje'>No hay juegos disponibles</p>";
+        return;
+    }
+
     contenedor.innerHTML = "";
 
     lista.forEach(j => {
-
         let stockClass = j.stock > 0 ? "stock-ok" : "stock-no";
 
         let card = document.createElement("div");
@@ -252,28 +229,13 @@ function cargarJuegos() {
             <div class="stock ${stockClass}">
                 ${j.stock > 0 ? "Disponibles: " + j.stock : "Agotado"}
             </div>
-            <button class="btn"
-                ${j.stock <= 0 ? "disabled" : ""}
-                onclick="comprar('${j.id}')">
-                Comprar
-            </button>
         `;
 
         contenedor.appendChild(card);
     });
 }
 
-function comprar(id) {
-    let juego = juegos.find(j => j.id === id);
-
-    if (juego.stock > 0) {
-        juego.stock--;
-        alert("Compra simulada");
-        cargarJuegos();
-    }
-}
-
-document.getElementById("filtro").addEventListener("change", cargarJuegos);
+document.getElementById("filtro").addEventListener("change", () => render(juegosGlobal));
 
 cargarJuegos();
 
