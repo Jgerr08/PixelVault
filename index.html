@@ -182,22 +182,17 @@ select {
 
 <script>
 
-let juegosGlobal = [];
+let juegosGlobal = [
+    { titulo: "Lego Batman: The Videogame", consola: "Xbox", precio: 200, stock: 3, img: "img/batman.jpg" },
+    { titulo: "Lego Harry Potter: Years 1-4", consola: "Xbox", precio: 250, stock: 3, img: "img/lego-harry-potter.jpg" },
+    { titulo: "Lego Star Wars: The Complete Saga", consola: "Xbox", precio: 400, stock: 1, img: "img/star_wars.jpg" },
+    { titulo: "Kinect Rush: Una aventura de Disney Pixar", consola: "Xbox", precio: 200, stock: 3, img: "img/disney-rush.jpg" },
+    { titulo: "Kinect Sports Ultimate Collection", consola: "Xbox", precio: 250, stock: 0, img: "img/kinect-sports-UC.jpg" },
+    { titulo: "Kinect Sports 01", consola: "Xbox", precio: 100, stock: 3, img: "img/kinect-sports-01.jpeg" },
+    { titulo: "Kinect Adventures", consola: "Xbox", precio: 150, stock: 4, img: "img/kinect-adventures.jpg" }
+];
 
-async function cargarJuegos() {
-    try {
-        let res = await fetch("http://192.168.1.18:8080/games"); 
-
-        if (!res.ok) throw new Error("Error servidor");
-
-        juegosGlobal = await res.json();
-        render(juegosGlobal);
-
-    } catch (error) {
-        document.getElementById("catalogo").innerHTML =
-            "<p class='mensaje'>Error cargando catálogo</p>";
-    }
-}
+render(juegosGlobal);
 
 function render(lista) {
     let filtro = document.getElementById("filtro").value;
@@ -223,6 +218,8 @@ function render(lista) {
         card.className = "card";
 
         card.innerHTML = `
+            <img src="${j.img}" style="width:100%; height:160px; object-fit:cover; border-radius:12px; margin-bottom:10px;">
+
             <div class="titulo">${j.titulo}</div>
             <div class="info">${j.consola}</div>
             <div class="precio">$${j.precio}</div>
